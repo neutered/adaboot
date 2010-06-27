@@ -23,10 +23,10 @@
 PROGRAM    = ATmegaBOOT_xx8
 
 # enter the parameters for the avrdude isp tool
-ISPTOOL	   = stk500v2
+# ISPTOOL	   = stk500v2
+# ISPPORT	   = COM1
 ISPTOOL	   = usbtiny
 ISPPORT	   = usb
-ISPPORT	   = COM1
 ISPSPEED   = -b 115200 -B 1
 
 MCU_TARGET = atmega168
@@ -52,7 +52,7 @@ STK500-2 = $(STK500) -d$(MCU_TARGET) -ms -q -lCF -LCF -cUSB -I200kHz -s -wt
 OBJ        = $(PROGRAM).o
 OPTIMIZE   = -O2
 
-DEFS       = 
+DEFS       =
 LIBS       =
 
 CC         = avr-gcc
@@ -100,14 +100,14 @@ pro20: LFUSE = C6
 diecimila: TARGET = diecimila
 diecimila: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>4' '-DNUM_LED_FLASHES=1'
 diecimila: $(PROGRAM)_diecimila.hex
-diecimila: AVR_FREQ = 16000000L 
+diecimila: AVR_FREQ = 16000000L
 diecimila: HFUSE = DD
 diecimila: LFUSE = C6
 
 adaboot328: TARGET = adaboot328
-adaboot328: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>2' '-DNUM_LED_FLASHES=3'  '-DWATCHDOG_MODS'
-adaboot328: $(PROGRAM)_adaboot328.hex
-adaboot328: AVR_FREQ = 16000000L 
+adaboot328: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>2' '-DNUM_LED_FLASHES=3' '-DWATCHDOG_MODS'
+adaboot328: $(PROGRAM)_adaboot328.hex $(PROGRAM)_adaboot328.lst
+adaboot328: AVR_FREQ = 16000000L
 adaboot328: MCU_TARGET = atmega328p
 adaboot328: LDSECTION  = --section-start=.text=0x7800
 
@@ -120,7 +120,7 @@ ng: AVR_FREQ = 16000000L
 
 override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) -DF_CPU=$(AVR_FREQ) $(DEFS)
 override LDFLAGS       = -Wl,$(LDSECTION)
-#override LDFLAGS       = -Wl,-Map,$(PROGRAM).map,$(LDSECTION)
+override LDFLAGS       += -Wl,-Map,$(PROGRAM).map
 
 isp328: $(PROGRAM)_$(TARGET).hex
 	avrdude -c $(ISPTOOL) -p m328p -P $(ISPPORT) $(ISPSPEED) -e -u -U lock:w:0x3f:m -U efuse:w:0x05:m -U hfuse:w:0xDA:m -U lfuse:w:0xFF:m
